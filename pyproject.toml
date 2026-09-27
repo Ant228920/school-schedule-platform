@@ -1,0 +1,21 @@
+[project]
+name = "school-schedule-platform"
+version = "0.1.0"
+description = "High-load school schedule and gradebook platform"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I"]
+ignore = []
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
