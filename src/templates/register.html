@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Реєстрація{% endblock %}
+{% block content %}
+<div class="auth-card">
+  <h1>Реєстрація</h1>
+  {% if error %}<div class="alert">{{ error }}</div>{% endif %}
+  <form method="post" action="/register">
+    <label>ПІБ <input type="text" name="full_name" minlength="2" required></label>
+    <label>Email <input type="email" name="email" required></label>
+    <label>Пароль (мін. 8 символів) <input type="password" name="password" minlength="8" maxlength="72" required></label>
+    <button class="btn btn-primary" type="submit">Створити акаунт</button>
+  </form>
+  <p class="muted center">Вже є акаунт? <a href="/login">Увійти</a></p>
+</div>
+{% endblock %}

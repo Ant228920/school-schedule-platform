@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}Адмін-панель{% endblock %}
+{% block content %}
+<h1>Адміністрування</h1>
+<div class="stats">
+  <div class="card stat"><span class="stat-num">{{ users|length }}</span><span class="muted">Користувачів</span></div>
+  <div class="card stat"><span class="stat-num">{{ counts.get(Role.TEACHER, 0) }}</span><span class="muted">Вчителів</span></div>
+  <div class="card stat"><span class="stat-num">{{ counts.get(Role.STUDENT, 0) }}</span><span class="muted">Учнів</span></div>
+  <div class="card stat"><span class="stat-num">{{ classes|length }}</span><span class="muted">Класів</span></div>
+</div>
+
+<div class="grid-2 equal">
+  <section class="card">
+    <h2>Новий клас</h2>
+    <form method="post" action="/web/admin/classes">
+      <label>Назва (напр. 7-А) <input name="name" maxlength="20" required></label>
+      <button class="btn btn-primary" type="submit">Створити</button>
+    </form>
+    <p class="muted">Існуючі: {% for c in classes %}<span class="badge badge-student">{{ c.name }}</span> {% else %}—{% endfor %}</p>
+  </section>
+
+  <section class="card">
+    <h2>Додати урок у розклад</h2>
+    <form method="post" action="/web/admin/lessons">
+      <label>Клас <select name="class_id" required>{% for c in classes %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}</select></label>
+      <label>Вчитель <select name="teacher_id" required>{% for t in teachers %}<option value="{{ t.id }}">{{ t.full_name }}</option>{% endfor %}</select></label>
+      <label>Предмет <input name="subject" required></label>
+      <label>Кабінет <input name="room" maxlength="20" required></label>
+      <label>День <select name="weekday">{% for d in WEEKDAYS %}<option value="{{ loop.index0 }}">{{ d }}</option>{% endfor %}</select></label>
+      <label>Початок <input type="time" name="start_time" value="08:30" required></label>
+      <button class="btn btn-primary" type="submit">Додати</button>
+    </form>
+  </section>
+</div>
+
+<section class="card">
+  <h2>Розклад усіх класів</h2>
+  {% if lessons %}
+  <table>
+    <thead><tr><th>Клас</th><th>День</th><th>Час</th><th>Предмет</th><th>Каб.</th><th>Вчитель</th></tr></thead>
+    <tbody>
+    {% for l in lessons %}
+      <tr><td>{{ l.school_class.name }}</td><td>{{ WEEKDAYS[l.weekday] }}</td><td>{{ l.start_time.strftime('%H:%M') }}</td>
+          <td>{{ l.subject }}</td><td>{{ l.room }}</td><td>{{ l.teacher.full_name }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}<p class="muted">Розклад порожній.</p>{% endif %}
+</section>
+
+<section class="card">
+  <h2>Користувачі</h2>
+  <p class="muted">Роль, клас (для учня) та ID учня (для батьків) призначає адміністратор.</p>
+  <table class="users">
+    <thead><tr><th>ID</th><th>ПІБ / Email</th><th>Роль</th><th>Клас</th><th>ID дитини</th><th>Активний</th><th></th></tr></thead>
+    <tbody>
+    {% for u in users %}
+      <tr>
+        <td>{{ u.id }}<form id="uf{{ u.id }}" method="post" action="/web/admin/users/{{ u.id }}"></form></td>
+        <td>{{ u.full_name }}<br><span class="muted">{{ u.email }}</span></td>
+        <td><select name="role" form="uf{{ u.id }}">
+          {% for r in Role %}<option value="{{ r.value }}" {{ 'selected' if u.role == r }}>{{ r.value }}</option>{% endfor %}
+        </select></td>
+        <td><select name="class_id" form="uf{{ u.id }}"><option value="">—</option>
+          {% for c in classes %}<option value="{{ c.id }}" {{ 'selected' if u.class_id == c.id }}>{{ c.name }}</option>{% endfor %}
+        </select></td>
+        <td><input name="child_id" form="uf{{ u.id }}" value="{{ u.child_id or '' }}" size="4"></td>
+        <td><input type="checkbox" name="is_active" form="uf{{ u.id }}" {{ 'checked' if u.is_active }}></td>
+        <td><button class="btn btn-small" form="uf{{ u.id }}" type="submit">Зберегти</button></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

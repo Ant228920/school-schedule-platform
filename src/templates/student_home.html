@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Мій кабінет{% endblock %}
+{% block content %}
+<h1>Вітаємо, {{ user.full_name }}!</h1>
+{% if not student %}
+  <div class="card"><p class="muted">До вашого акаунта ще не прив'язано учня. Зверніться до адміністратора.</p></div>
+{% else %}
+  {% if student.id != user.id %}<p class="muted">Ви переглядаєте дані учня: <b>{{ student.full_name }}</b></p>{% endif %}
+  <div class="stats">
+    <div class="card stat"><span class="stat-num">{{ student.school_class.name if student.school_class else "—" }}</span><span class="muted">Клас</span></div>
+    <div class="card stat"><span class="stat-num">{{ avg if avg is not none else "—" }}</span><span class="muted">Середній бал</span></div>
+    <div class="card stat"><span class="stat-num">{{ lessons|length }}</span><span class="muted">Уроків на тиждень</span></div>
+  </div>
+  <div class="grid-2">
+    <section class="card">
+      <h2>Розклад</h2>
+      {% if lessons %}
+      <table>
+        <thead><tr><th>День</th><th>Час</th><th>Предмет</th><th>Каб.</th><th>Вчитель</th></tr></thead>
+        <tbody>
+        {% for l in lessons %}
+          <tr class="{{ 'today' if l.weekday == today }}">
+            <td>{{ WEEKDAYS[l.weekday] }}</td><td>{{ l.start_time.strftime('%H:%M') }}</td>
+            <td>{{ l.subject }}</td><td>{{ l.room }}</td><td>{{ l.teacher.full_name }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% else %}<p class="muted">Розклад ще не складено.</p>{% endif %}
+    </section>
+    <section class="card">
+      <h2>Останні оцінки</h2>
+      {% if grades %}
+      <table>
+        <thead><tr><th>Предмет</th><th>Оцінка</th><th>Дата</th></tr></thead>
+        <tbody>
+        {% for g in grades %}
+          <tr><td>{{ g.subject }}</td><td><span class="grade">{{ g.grade }}</span></td><td>{{ g.graded_on.strftime('%d.%m') }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      {% else %}<p class="muted">Оцінок поки немає.</p>{% endif %}
+    </section>
+  </div>
+{% endif %}
+{% endblock %}
