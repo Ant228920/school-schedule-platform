@@ -21,6 +21,15 @@ class AdminUserUpdate(BaseModel):
     is_active: bool | None = None
 
 
+class AdminUserCreate(BaseModel):
+    email: EmailStr
+    full_name: str = Field(min_length=2, max_length=255)
+    password: str = Field(min_length=8, max_length=72)
+    role: Role = Role.STUDENT
+    class_id: int | None = None
+    child_id: int | None = None
+
+
 class UserOut(BaseModel):
     id: int
     email: EmailStr

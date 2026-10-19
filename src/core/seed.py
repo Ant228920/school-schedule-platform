@@ -6,7 +6,7 @@ from src.core.security import hash_password
 
 
 def init_db() -> None:
-    import src.models  # noqa: F401  (реєстрація моделей)
+    import src.models  # noqa: F401
     from src.models.user import Role, User
 
     Base.metadata.create_all(engine)

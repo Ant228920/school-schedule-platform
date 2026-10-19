@@ -8,9 +8,6 @@ from src.core.security import create_access_token, hash_password
 from src.main import app
 from src.models.user import Role, User
 
-# =====================================================================
-# НАЛАШТУВАННЯ БАЗИ ДАНИХ ДЛЯ ТЕСТІВ (SQLite в оперативній пам'яті)
-# =====================================================================
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
 
 engine = create_engine(
@@ -21,21 +18,15 @@ engine = create_engine(
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
-# =====================================================================
-# ФІКСТУРИ
-# =====================================================================
 @pytest.fixture(scope="session", autouse=True)
 def setup_database_schema():
-    """Створює таблиці на час виконання тестової сесії."""
     Base.metadata.create_all(bind=engine)
     yield
-    # Оскільки це SQLite в пам'яті, безпечно дропати таблиці після завершення
     Base.metadata.drop_all(bind=engine)
 
 
 @pytest.fixture
 def db_session():
-    """Ізольована сесія, яка відкочує транзакції або очищає змінені дані."""
     connection = engine.connect()
     transaction = connection.begin()
     session = TestingSessionLocal(bind=connection)
@@ -49,8 +40,6 @@ def db_session():
 
 @pytest.fixture
 def client(db_session):
-    """Тестовий клієнт FastAPI із підміною залежності get_db."""
-
     def override_get_db():
         try:
             yield db_session

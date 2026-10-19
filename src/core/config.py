@@ -1,27 +1,53 @@
+import os
+from pathlib import Path
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Визначаємо абсолютний шлях до кореня проєкту (D:\school-schedule-platform)
+BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
+# Отримуємо значення APP_ENV, прибираємо зайві пробіли та переводимо в нижній регістр
+APP_ENV = os.getenv("APP_ENV", "sandbox").strip().lower()
+
+# Формуємо абсолютний шлях до файлу середовища: .env.sandbox або .env.production
+target_env_file = BASE_DIR / f".env.{APP_ENV}"
+
+# Fallback: якщо спеціального файлу середовища немає, беремо звичайний .env
+if not target_env_file.exists():
+    target_env_file = BASE_DIR / ".env"
 
 
 class Settings(BaseSettings):
-    # Pydantic автоматично прочитає ці значення з файлу .env
+    ENVIRONMENT: str = APP_ENV
+    DEBUG: bool = True
+
+    # Підключення до бази даних
     DB_USER: str
     DB_PASSWORD: str
-    DB_HOST: str
-    DB_PORT: int
+    DB_HOST: str = "localhost"
+    DB_PORT: int = 5432
     DB_NAME: str
 
-    SECRET_KEY: str = "change-me-in-env"
+    # Безпека та JWT
+    SECRET_KEY: str = "sandbox-default-secret-key-12345"
     ALGORITHM: str = "HS256"
     TOKEN_EXPIRE_MINUTES: int = 60
     COOKIE_SECURE: bool = False
-    ADMIN_EMAIL: str = "admin@school.ua"
-    ADMIN_PASSWORD: str = "Admin12345"
 
-    # Ця властивість динамічно збирає URL з підтягнутих вище змінних
+    # Адміністратор
+    ADMIN_EMAIL: str
+    ADMIN_PASSWORD: str
+
     @property
     def database_url(self) -> str:
-        return f"postgresql+psycopg2://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+        return f"postgresql+psycopg2://{self.DB_USER}:{self.DB_PASSWORD}" f"@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+    # Передаємо один чіткий абсолютний шлях до файлу
+    model_config = SettingsConfigDict(
+        env_file=target_env_file,
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
 
 
 settings = Settings()

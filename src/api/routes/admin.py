@@ -8,7 +8,7 @@ from src.core.database import get_db
 from src.models.school_class import SchoolClass
 from src.models.user import Role, User
 from src.schemas.school import ClassCreate, ClassOut, LessonCreate, LessonOut
-from src.schemas.user import AdminUserUpdate, UserOut
+from src.schemas.user import AdminUserCreate, AdminUserUpdate, UserOut
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 AdminOnly = Depends(require_roles(Role.ADMIN))
@@ -17,6 +17,11 @@ AdminOnly = Depends(require_roles(Role.ADMIN))
 @router.get("/users", response_model=list[UserOut])
 def list_users(_: User = AdminOnly, db: Session = Depends(get_db)):
     return db.scalars(select(User).order_by(User.id)).all()
+
+
+@router.post("/users", response_model=UserOut, status_code=201)
+def create_user(data: AdminUserCreate, _: User = AdminOnly, db: Session = Depends(get_db)):
+    return services.create_user(db, **data.model_dump())
 
 
 @router.patch("/users/{user_id}", response_model=UserOut)

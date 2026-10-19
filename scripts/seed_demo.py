@@ -31,6 +31,11 @@ def user(db, email, name, role, **kw):
 
 
 def main():
+    from src.core.config import settings
+
+    print(f"--> Скрипт підключається до бази: {settings.DB_NAME}")
+    print(f"--> Повний URL: {settings.database_url}")
+    init_db()
     init_db()
     with SessionLocal() as db:
         cls = db.scalar(select(SchoolClass).where(SchoolClass.name == "7-А"))

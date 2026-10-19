@@ -3,9 +3,12 @@
 import datetime as dt
 
 from fastapi import HTTPException
+from pydantic import EmailStr, TypeAdapter
+from pydantic_core import ValidationError
 from sqlalchemy import or_, select
 from sqlalchemy.orm import Session
 
+from src.core.security import hash_password
 from src.models.journal import JournalRecord
 from src.models.schedule import Schedule
 from src.models.school_class import SchoolClass
@@ -60,6 +63,55 @@ def create_lesson(
     db.commit()
     db.refresh(lesson)
     return lesson
+
+
+_email_adapter = TypeAdapter(EmailStr)
+
+
+def _validate_links(db: Session, class_id: int | None, child_id: int | None) -> None:
+    """Клас має існувати, а child_id — вказувати на учня."""
+    if class_id is not None and not db.get(SchoolClass, class_id):
+        raise HTTPException(404, "Клас не знайдено")
+    if child_id is not None:
+        child = db.get(User, child_id)
+        if not child or child.role != Role.STUDENT:
+            raise HTTPException(400, "child_id має вказувати на учня")
+
+
+def create_user(
+    db: Session,
+    email: str,
+    full_name: str,
+    password: str,
+    role: Role,
+    class_id: int | None = None,
+    child_id: int | None = None,
+) -> User:
+    """Створення акаунта адміністратором (будь-яка роль)."""
+    email = email.strip()
+    try:
+        email = _email_adapter.validate_python(email)
+    except ValidationError:
+        raise HTTPException(400, "Некоректний email")
+    if len(full_name.strip()) < 2:
+        raise HTTPException(400, "ПІБ занадто короткий")
+    if not 8 <= len(password) <= 72:
+        raise HTTPException(400, "Пароль має містити від 8 до 72 символів")
+    if db.scalar(select(User).where(User.email == email)):
+        raise HTTPException(409, "Користувач з таким email уже існує")
+    _validate_links(db, class_id, child_id)
+    user = User(
+        email=email,
+        full_name=full_name.strip(),
+        hashed_password=hash_password(password),
+        role=role,
+        class_id=class_id,
+        child_id=child_id,
+    )
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    return user
 
 
 def update_user(db: Session, admin: User, user_id: int, changes: dict) -> User:

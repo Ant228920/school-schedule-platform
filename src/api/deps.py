@@ -7,7 +7,6 @@ from src.core.database import get_db
 from src.core.security import decode_token
 from src.models.user import Role, User
 
-# auto_error=False: токен можна передати і в заголовку Bearer (API), і в cookie (браузер)
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)
 
 
@@ -32,7 +31,7 @@ def get_current_user(
     user = db.get(User, user_id)
     if not user or not user.is_active:
         raise error
-    return user  # роль береться з БД, а не з токена
+    return user
 
 
 def require_roles(*roles: Role):

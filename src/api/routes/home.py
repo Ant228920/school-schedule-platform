@@ -29,7 +29,6 @@ def _int_or_none(value: str) -> int | None:
         raise HTTPException(400, "Очікувалося число")
 
 
-# ---------- учень / батьки ----------
 @router.get("/student/home")
 def student_home(
     request: Request,
