@@ -44,7 +44,7 @@ async def html_aware_errors(request: Request, exc: StarletteHTTPException):
     return await http_exception_handler(request, exc)
 
 
-@app.exception_handler(Exception)
+    @app.exception_handler(Exception)
 async def global_500_exception_handler(request: Request, exc: Exception):
     logger.error(f"Непередбачена помилка: {exc}", exc_info=True)
 
