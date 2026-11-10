@@ -1,0 +1,38 @@
+# Git і CI
+.git
+.github
+.gitignore
+.pre-commit-config.yaml
+
+# Секрети і локальні налаштування
+.env
+.env.*
+!.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+ENV/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Тести, навантажувальні тести та їх результати
+tests/
+loadtest/
+
+# Логи та IDE
+*.log
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Docker-файли не потрібні всередині образу
+Dockerfile
+docker-compose*.yml
+.dockerignore

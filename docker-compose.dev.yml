@@ -1,0 +1,20 @@
+# Режим розробки з hot-reload.
+# Запуск: docker compose -f docker-compose.yml -f docker-compose.dev.yml up --build
+services:
+  web:
+    command:
+      - uvicorn
+      - src.main:app
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --reload
+      - --reload-dir
+      - /app/src
+    environment:
+      # на Windows/Docker Desktop події файлової системи через bind mount
+      # не доходять до контейнера, тому вмикаємо опитування
+      WATCHFILES_FORCE_POLLING: "true"
+    volumes:
+      - ./src:/app/src
