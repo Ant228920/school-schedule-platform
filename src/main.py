@@ -1,4 +1,5 @@
 import logging
+import socket
 from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, Request
@@ -13,6 +14,9 @@ from src.core.seed import init_db
 from src.core.templating import BASE_DIR, templates
 
 logger = logging.getLogger(__name__)
+
+# Ім'я контейнера (hostname): за ним видно, яка саме репліка відповіла
+SERVER_ID = socket.gethostname()
 
 
 @asynccontextmanager
@@ -30,6 +34,18 @@ app = FastAPI(
 app.mount("/static", StaticFiles(directory=BASE_DIR / "static"), name="static")
 
 
+@app.middleware("http")
+async def add_server_id_header(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["X-Served-By"] = SERVER_ID
+    return response
+
+
+@app.get("/whoami", include_in_schema=False)
+def whoami():
+    return {"hostname": SERVER_ID}
+
+
 @app.exception_handler(StarletteHTTPException)
 async def html_aware_errors(request: Request, exc: StarletteHTTPException):
     if "text/html" in request.headers.get("accept", ""):
@@ -44,7 +60,7 @@ async def html_aware_errors(request: Request, exc: StarletteHTTPException):
     return await http_exception_handler(request, exc)
 
 
-    @app.exception_handler(Exception)
+@app.exception_handler(Exception)
 async def global_500_exception_handler(request: Request, exc: Exception):
     logger.error(f"Непередбачена помилка: {exc}", exc_info=True)
 
