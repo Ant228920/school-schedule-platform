@@ -4,9 +4,14 @@ from sqlalchemy.orm import declarative_base, sessionmaker
 from src.core.config import settings
 
 # Звертаємося до властивості маленькими літерами (settings.database_url)
-engine = create_engine(settings.database_url)
-
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+engine = create_engine(
+    settings.database_url,
+    pool_size=settings.DB_POOL_SIZE,
+    max_overflow=settings.DB_MAX_OVERFLOW,
+    pool_timeout=settings.DB_POOL_TIMEOUT,
+    pool_recycle=settings.DB_POOL_RECYCLE,
+)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, expire_on_commit=False, bind=engine)
 
 Base = declarative_base()
 

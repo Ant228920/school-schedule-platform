@@ -23,6 +23,15 @@ class Settings(BaseSettings):
     DB_PORT: int = 5432
     DB_NAME: str
 
+    DB_POOL_SIZE: int = 15
+    DB_MAX_OVERFLOW: int = 10
+    DB_POOL_TIMEOUT: int = 5
+    DB_POOL_RECYCLE: int = 1800
+    REDIS_URL: str = ""
+    CACHE_TTL_USER: int = 60
+    CACHE_TTL_SCHEDULE: int = 300
+    CACHE_TTL_GRADES: int = 30
+
     SECRET_KEY: str = "sandbox-default-secret-key-12345"
     ALGORITHM: str = "HS256"
     TOKEN_EXPIRE_MINUTES: int = 60

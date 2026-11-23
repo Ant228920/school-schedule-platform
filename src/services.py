@@ -6,13 +6,42 @@ from fastapi import HTTPException
 from pydantic import EmailStr, TypeAdapter
 from pydantic_core import ValidationError
 from sqlalchemy import or_, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
+from src.core.cache import cache
+from src.core.config import settings
 from src.core.security import hash_password
 from src.models.journal import JournalRecord
 from src.models.schedule import Schedule
 from src.models.school_class import SchoolClass
 from src.models.user import Role, User
+
+
+def get_user(db: Session, user_id: int) -> User | None:
+    """Знімок користувача для перевірки доступу (кешується в Redis на CACHE_TTL_USER секунд).
+
+    Повертає об'єкт User без прив'язки до сесії: читати можна id, email, full_name, role,
+    is_active, class_id, child_id. Зв'язки (school_class) і hashed_password недоступні.
+    """
+    key = f"user:{user_id}"
+    data = cache.get(key)
+    if data is None:
+        row = db.execute(
+            select(User.id, User.email, User.full_name, User.is_active, User.class_id, User.child_id, User.role).where(User.id == user_id)
+        ).one_or_none()
+        if row is None:
+            return None
+        data = {
+            "id": row.id,
+            "email": row.email,
+            "full_name": row.full_name,
+            "is_active": row.is_active,
+            "class_id": row.class_id,
+            "child_id": row.child_id,
+            "role": row.role.value,
+        }
+        cache.set(key, data, settings.CACHE_TTL_USER)
+    return User(**{**data, "role": Role(data["role"])})
 
 
 def create_class(db: Session, name: str) -> SchoolClass:
@@ -130,6 +159,8 @@ def update_user(db: Session, admin: User, user_id: int, changes: dict) -> User:
         setattr(target, field, value)
     db.commit()
     db.refresh(target)
+    # роль / активність / клас змінилися: знімок користувача в кеші вже недійсний
+    cache.delete(f"user:{target.id}")
     return target
 
 
@@ -191,15 +222,29 @@ def resolve_student(db: Session, user: User) -> User | None:
     if user.role == Role.STUDENT:
         return user
     if user.role == Role.PARENT and user.child_id:
-        child = db.get(User, user.child_id)
+        child = get_user(db, user.child_id)
         return child if child and child.role == Role.STUDENT else None
     return None
+
+
+def class_name(db: Session, class_id: int | None) -> str | None:
+    """Назва класу окремим легким запитом (у get_user зв'язок school_class недоступний)."""
+    if class_id is None:
+        return None
+    return db.scalar(select(SchoolClass.name).where(SchoolClass.id == class_id))
 
 
 def class_lessons(db: Session, class_id: int | None) -> list[Schedule]:
     if class_id is None:
         return []
-    return list(db.scalars(select(Schedule).where(Schedule.class_id == class_id).order_by(Schedule.weekday, Schedule.start_time)).all())
+    return list(
+        db.scalars(
+            select(Schedule)
+            .options(joinedload(Schedule.teacher))  # шаблон читає l.teacher.full_name: один JOIN замість N запитів
+            .where(Schedule.class_id == class_id)
+            .order_by(Schedule.weekday, Schedule.start_time)
+        ).all()
+    )
 
 
 def student_grades(db: Session, student_id: int, limit: int = 50) -> list[JournalRecord]:
