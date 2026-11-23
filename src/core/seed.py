@@ -19,6 +19,7 @@ def init_db() -> None:
     from src.models.user import Role, User
 
     Base.metadata.create_all(engine)
+    apply_perf_indexes()
     with SessionLocal() as db:
         if not db.scalar(select(User).where(User.email == settings.ADMIN_EMAIL)):
             db.add(

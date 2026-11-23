@@ -5,7 +5,7 @@ import datetime as dt
 from fastapi import APIRouter, Depends, Form, HTTPException, Request
 from fastapi.responses import RedirectResponse
 from sqlalchemy import func, select
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from src import services
 from src.api.deps import require_roles
@@ -39,12 +39,14 @@ def student_home(
     lessons = services.class_lessons(db, student.class_id) if student else []
     grades = services.student_grades(db, student.id, limit=20) if student else []
     avg = round(sum(g.grade for g in grades) / len(grades), 1) if grades else None
+    class_name = services.class_name(db, student.class_id) if student else None
     return templates.TemplateResponse(
         request,
         "student_home.html",
         {
             "user": user,
             "student": student,
+            "class_name": class_name,
             "lessons": lessons,
             "grades": grades,
             "avg": avg,
@@ -60,14 +62,34 @@ def teacher_home(
     user: User = Depends(require_roles(Role.TEACHER)),
     db: Session = Depends(get_db),
 ):
-    lessons = list(db.scalars(select(Schedule).where(Schedule.teacher_id == user.id).order_by(Schedule.weekday, Schedule.start_time)).all())
+    lessons = list(
+        db.scalars(
+            select(Schedule)
+            .options(joinedload(Schedule.school_class))
+            .where(Schedule.teacher_id == user.id)
+            .order_by(Schedule.weekday, Schedule.start_time)
+        ).all()
+    )
     class_ids = {lesson.class_id for lesson in lessons}
     students = (
-        list(db.scalars(select(User).where(User.role == Role.STUDENT, User.class_id.in_(class_ids)).order_by(User.full_name)).all())
+        list(
+            db.scalars(
+                select(User)
+                .options(joinedload(User.school_class))
+                .where(User.role == Role.STUDENT, User.class_id.in_(class_ids))
+                .order_by(User.full_name)
+            ).all()
+        )
         if class_ids
         else []
     )
-    recent = db.scalars(select(JournalRecord).where(JournalRecord.teacher_id == user.id).order_by(JournalRecord.id.desc()).limit(15)).all()
+    recent = db.scalars(
+        select(JournalRecord)
+        .options(joinedload(JournalRecord.student))
+        .where(JournalRecord.teacher_id == user.id)
+        .order_by(JournalRecord.id.desc())
+        .limit(15)
+    ).all()
     return templates.TemplateResponse(
         request,
         "teacher_home.html",
@@ -117,7 +139,13 @@ def admin_home(
     counts = dict(db.execute(select(User.role, func.count()).group_by(User.role)).all())
     users = list(db.scalars(select(User).order_by(User.id)).all())
     classes = list(db.scalars(select(SchoolClass).order_by(SchoolClass.name)).all())
-    lessons = list(db.scalars(select(Schedule).order_by(Schedule.class_id, Schedule.weekday, Schedule.start_time)).all())
+    lessons = list(
+        db.scalars(
+            select(Schedule)
+            .options(joinedload(Schedule.school_class), joinedload(Schedule.teacher))
+            .order_by(Schedule.class_id, Schedule.weekday, Schedule.start_time)
+        ).all()
+    )
     return templates.TemplateResponse(
         request,
         "admin_home.html",

@@ -7,7 +7,7 @@
 {% else %}
   {% if student.id != user.id %}<p class="muted">Ви переглядаєте дані учня: <b>{{ student.full_name }}</b></p>{% endif %}
   <div class="stats">
-    <div class="card stat"><span class="stat-num">{{ student.school_class.name if student.school_class else "—" }}</span><span class="muted">Клас</span></div>
+    <div class="card stat"><span class="stat-num">{{ class_name or "—" }}</span><span class="muted">Клас</span></div>
     <div class="card stat"><span class="stat-num">{{ avg if avg is not none else "—" }}</span><span class="muted">Середній бал</span></div>
     <div class="card stat"><span class="stat-num">{{ lessons|length }}</span><span class="muted">Уроків на тиждень</span></div>
   </div>

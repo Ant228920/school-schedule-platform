@@ -3,6 +3,7 @@ from fastapi import Depends, HTTPException, Request, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 
+from src import services
 from src.core.database import get_db
 from src.core.security import decode_token
 from src.models.user import Role, User
@@ -28,7 +29,8 @@ def get_current_user(
         user_id = int(payload["sub"])
     except (jwt.PyJWTError, KeyError, ValueError):
         raise error
-    user = db.get(User, user_id)
+    user = services.get_user(db, user_id)
+    db.close()
     if not user or not user.is_active:
         raise error
     return user
