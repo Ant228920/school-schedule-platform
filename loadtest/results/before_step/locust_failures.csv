@@ -1,0 +1,14 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,GET /student/home,"ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None)",4,2026-11-23T22:47:54Z,2026-11-23T22:49:54Z
+GET,GET /teacher/home,HTTPError('500 Server Error: Internal Server Error for url: GET /teacher/home'),21,2026-11-23T22:47:54Z,2026-11-23T22:49:54Z
+POST,POST /journal,CatchResponseError('HTTP 500'),9,2026-11-23T22:47:54Z,2026-11-23T22:49:24Z
+GET,GET /student/grades,HTTPError('500 Server Error: Internal Server Error for url: GET /student/grades'),25,2026-11-23T22:47:53Z,2026-11-23T22:49:54Z
+GET,GET /student/schedule,"ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None)",3,2026-11-23T22:47:54Z,2026-11-23T22:48:55Z
+GET,GET /student/grades,"ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None)",2,2026-11-23T22:48:24Z,2026-11-23T22:49:55Z
+GET,GET /users/me,HTTPError('500 Server Error: Internal Server Error for url: GET /users/me'),14,2026-11-23T22:47:53Z,2026-11-23T22:49:54Z
+GET,GET /student/schedule,HTTPError('500 Server Error: Internal Server Error for url: GET /student/schedule'),21,2026-11-23T22:47:53Z,2026-11-23T22:49:54Z
+GET,GET /student/home,HTTPError('500 Server Error: Internal Server Error for url: GET /student/home'),42,2026-11-23T22:47:53Z,2026-11-23T22:49:55Z
+POST,POST /login,CatchResponseError('login failed: HTTP 500'),45,2026-11-23T22:47:54Z,2026-11-23T22:49:55Z
+GET,GET /teacher/schedule,HTTPError('500 Server Error: Internal Server Error for url: GET /teacher/schedule'),15,2026-11-23T22:47:54Z,2026-11-23T22:49:54Z
+GET,GET /users/me,"ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None)",1,2026-11-23T22:49:55Z,2026-11-23T22:49:55Z
+GET,GET /student/grades,"ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None)",1,2026-11-23T22:47:54Z,2026-11-23T22:47:54Z

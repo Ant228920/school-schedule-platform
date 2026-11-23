@@ -1,0 +1,21 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,GET /student/grades,HTTPError('401 Client Error: Unauthorized for url: GET /student/grades'),3,2026-11-23T22:57:07Z,2026-11-23T22:57:24Z
+GET,GET /users/me,HTTPError('401 Client Error: Unauthorized for url: GET /users/me'),9,2026-11-23T22:57:07Z,2026-11-23T22:57:24Z
+POST,POST /journal,CatchResponseError('HTTP 0'),1,2026-11-23T22:56:46Z,2026-11-23T22:56:46Z
+GET,GET /teacher/schedule,HTTPError('401 Client Error: Unauthorized for url: GET /teacher/schedule'),1,2026-11-23T22:57:24Z,2026-11-23T22:57:24Z
+GET,GET /teacher/home,HTTPError('500 Server Error: Internal Server Error for url: GET /teacher/home'),49,2026-11-23T22:56:41Z,2026-11-23T22:57:29Z
+POST,POST /journal,CatchResponseError('HTTP 500'),23,2026-11-23T22:56:52Z,2026-11-23T22:57:29Z
+GET,GET /student/grades,HTTPError('500 Server Error: Internal Server Error for url: GET /student/grades'),72,2026-11-23T22:56:40Z,2026-11-23T22:57:29Z
+GET,GET /student/schedule,"ConnectionResetError(10054, 'An existing connection was forcibly closed by the remote host', None, 10054, None)",2,2026-11-23T22:56:46Z,2026-11-23T22:56:46Z
+GET,GET /student/grades,"ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None)",2,2026-11-23T22:56:46Z,2026-11-23T22:56:46Z
+GET,GET /teacher/home,"ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None)",3,2026-11-23T22:56:46Z,2026-11-23T22:56:46Z
+GET,GET /student/schedule,HTTPError('401 Client Error: Unauthorized for url: GET /student/schedule'),2,2026-11-23T22:57:07Z,2026-11-23T22:57:24Z
+GET,GET /student/schedule,HTTPError('500 Server Error: Internal Server Error for url: GET /student/schedule'),54,2026-11-23T22:56:40Z,2026-11-23T22:57:29Z
+GET,GET /student/schedule,"ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None)",2,2026-11-23T22:56:46Z,2026-11-23T22:56:46Z
+GET,GET /student/home,HTTPError('500 Server Error: Internal Server Error for url: GET /student/home'),96,2026-11-23T22:56:40Z,2026-11-23T22:57:29Z
+POST,POST /login,CatchResponseError('login failed: HTTP 500'),16,2026-11-23T22:56:46Z,2026-11-23T22:56:46Z
+POST,POST /journal,CatchResponseError('HTTP 401'),5,2026-11-23T22:57:07Z,2026-11-23T22:57:24Z
+GET,GET /student/home,HTTPError('401 Client Error: Unauthorized for url: GET /student/home'),6,2026-11-23T22:57:07Z,2026-11-23T22:57:24Z
+GET,GET /teacher/home,HTTPError('401 Client Error: Unauthorized for url: GET /teacher/home'),6,2026-11-23T22:57:07Z,2026-11-23T22:57:24Z
+GET,GET /teacher/schedule,HTTPError('500 Server Error: Internal Server Error for url: GET /teacher/schedule'),44,2026-11-23T22:56:40Z,2026-11-23T22:57:29Z
+GET,GET /student/home,"ConnectionAbortedError(10053, 'An established connection was aborted by the software in your host machine', None, 10053, None)",1,2026-11-23T22:56:46Z,2026-11-23T22:56:46Z
