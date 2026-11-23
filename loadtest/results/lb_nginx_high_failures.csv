@@ -1,0 +1,10 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,GET /student/grades,HTTPError('401 Client Error: Unauthorized for url: GET /student/grades'),173,2026-11-16T12:25:59Z,2026-11-16T12:26:55Z
+GET,GET /users/me,HTTPError('401 Client Error: Unauthorized for url: GET /users/me'),98,2026-11-16T12:25:58Z,2026-11-16T12:26:56Z
+GET,GET /teacher/schedule,HTTPError('401 Client Error: Unauthorized for url: GET /teacher/schedule'),182,2026-11-16T12:25:58Z,2026-11-16T12:26:56Z
+POST,POST /journal,CatchResponseError('HTTP 504'),4,2026-11-16T12:26:04Z,2026-11-16T12:26:25Z
+GET,GET /student/schedule,HTTPError('401 Client Error: Unauthorized for url: GET /student/schedule'),184,2026-11-16T12:25:57Z,2026-11-16T12:26:56Z
+POST,POST /journal,CatchResponseError('HTTP 401'),88,2026-11-16T12:26:01Z,2026-11-16T12:26:55Z
+GET,GET /student/home,HTTPError('401 Client Error: Unauthorized for url: GET /student/home'),298,2026-11-16T12:25:57Z,2026-11-16T12:26:56Z
+GET,GET /teacher/home,HTTPError('401 Client Error: Unauthorized for url: GET /teacher/home'),270,2026-11-16T12:25:59Z,2026-11-16T12:26:56Z
+POST,POST /login,CatchResponseError('login failed: HTTP 504'),65,2026-11-16T12:25:57Z,2026-11-16T12:26:37Z

@@ -1,0 +1,2 @@
+Method,Name,Error,Occurrences,First Seen,Last Seen
+GET,GET /teacher/home,HTTPError('500 Server Error: Internal Server Error for url: GET /teacher/home'),2,2026-11-16T12:24:23Z,2026-11-16T12:24:23Z
