@@ -50,6 +50,7 @@ def login_submit(
     db: Session = Depends(get_db),
 ):
     user = db.scalar(select(User).where(User.email == email))
+    db.close()
     if not user or not user.is_active or not verify_password(password, user.hashed_password):
         return templates.TemplateResponse(
             request,

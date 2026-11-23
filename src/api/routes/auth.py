@@ -30,6 +30,7 @@ def register(data: UserRegister, db: Session = Depends(get_db)):
 @router.post("/login", response_model=Token)
 def login(form: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.scalar(select(User).where(User.email == form.username))
+    db.close()
     if not user or not user.is_active or not verify_password(form.password, user.hashed_password):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Incorrect email or password")
     return Token(access_token=create_access_token(user.id, user.role.value))

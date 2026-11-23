@@ -6,9 +6,10 @@ x-web: &web
   image: school-schedule-web
   env_file: .env
   environment:
-    # у контейнері БД доступна за іменем сервісу, а не localhost
+    # у контейнері БД і Redis доступні за іменем сервісу, а не localhost
     DB_HOST: db
     DB_PORT: "5432"
+    REDIS_URL: redis://redis:6379/0
   networks:
     - backend
   healthcheck:
@@ -40,12 +41,27 @@ services:
       retries: 10
       start_period: 10s
 
+  # Спільний кеш для всіх реплік: інвалідація на одній репліці діє на решту.
+  # Лише пам'ять, без запису на диск; при заповненні витісняє найстарші ключі (LRU).
+  redis:
+    image: redis:7-alpine
+    command: ["redis-server", "--maxmemory", "128mb", "--maxmemory-policy", "allkeys-lru", "--save", "", "--appendonly", "no"]
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   # Перша репліка створює таблиці при старті, тому решта чекає на неї
   web1:
     <<: *web
     hostname: web1
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     # порт відкрито лише для порівняльного тесту «одна репліка» (додаткове 2)
     ports:
@@ -57,6 +73,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
       web1:
         condition: service_healthy
 
@@ -65,6 +83,8 @@ services:
     hostname: web3
     depends_on:
       db:
+        condition: service_healthy
+      redis:
         condition: service_healthy
       web1:
         condition: service_healthy

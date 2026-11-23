@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from src.api.deps import get_current_user
+from src.core.cache import cache
 from src.core.database import get_db
 from src.models.user import Role, User
 from src.schemas.user import UserOut, UserUpdate
@@ -31,4 +32,5 @@ def update_user(
         target.full_name = data.full_name
     db.commit()
     db.refresh(target)
+    cache.delete(f"user:{target.id}")
     return target

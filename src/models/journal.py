@@ -14,8 +14,8 @@ class JournalRecord(Base):
     )
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    student_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
-    teacher_id: Mapped[int] = mapped_column(ForeignKey("users.id"), index=True)
+    student_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    teacher_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
     subject: Mapped[str] = mapped_column(String(100))
     grade: Mapped[int]
     graded_on: Mapped[dt.date] = mapped_column(default=dt.date.today)
