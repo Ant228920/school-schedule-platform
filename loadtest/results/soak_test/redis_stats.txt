@@ -1,0 +1,7 @@
+
+keyspace_hits:9923
+keyspace_misses:6
+
+
+
+used_memory_human:1.35M
